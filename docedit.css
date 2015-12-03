@@ -1,0 +1,45 @@
+
+.doceditjs-nodes,
+.doceditjs-nodes tr, 
+.doceditjs-nodes tr td {
+    border-spacing: 0;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.doceditjs-td-label {
+    font-weight: bold !important;
+    vertical-align: center !important;
+}
+
+.doceditjs-td-content {
+    padding: 0 !important;
+    width: 100%;
+}
+
+.doceditjs-td-content .form-control {
+    
+    border: 0 !important;
+}
+
+.doceditjs-td-content .doceditjs-nodes {
+    border: 0 !important;
+}
+
+.doceditjs-td-content .doceditjs-td-content {
+    border-right: 0 !important;
+}
+
+.doceditjs-td-content .doceditjs-td-label {
+    border-left: 0 !important;
+}
+
+.doceditjs-td-content tr:first-child>.doceditjs-td-content, 
+.doceditjs-td-content tr:first-child>.doceditjs-td-label {
+    border-top: 0 !important;
+}
+
+.doceditjs-td-content tr:last-child>.doceditjs-td-content, 
+.doceditjs-td-content tr:last-child>.doceditjs-td-label {
+    border-bottom: 0 !important;
+}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>Doc JS Demo</title>
+    
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    
+    <link rel="stylesheet" href="../docedit.css">
+    
+  </head>
+  <body>
+    <div ng-app="myApp" ng-controller="myController" class="container">
+        {{document}}
+        <button type="button" ng-click="update()">Reset Object</button>
+       <doceditjs-editor dejs-data="document"></doceditjs-editor>
+    </div>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js"></script>
+    <script src="../docedit.js"></script>
+    <script>
+        
+        angular.module('myApp', ['doceditjs'])
+        .controller('myController', ['$scope', function($scope){
+
+            $scope.document = {
+                a: [
+                    "item 1",
+                    "item 2",
+                    5,
+                    new Date()
+                ],
+                b: {
+                    c: [
+                        "item 3",
+                        "item 4"
+                        ]
+                },
+                d: "more stuff"
+            };
+            
+            $scope.update = function(){
+                $scope.document = {
+                    a: [
+                        "item 1",
+                        "item 2",
+                        5,
+                        new Date()
+                    ],
+                    b: {
+                        c: [
+                            "item 3",
+                            "item 4"
+                            ]
+                    },
+                    d: "more stuff"
+                };
+            };
+        }]);
+        
+    </script>
+  </body>
+</html>
