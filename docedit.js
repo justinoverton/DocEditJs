@@ -35,20 +35,16 @@
     DocEditJs.prototype.getTypeInfo = function(discriminator, o, typeName){
         var typeDetails = null;
         
-        if(typeName)
-            typeDetails = this.typeInfo(typeName);
-        
-        if(!typeDetails){
+        if(!typeName){
             if(angular.isFunction(discriminator)){
-                typeDetails = discriminator(o, typeName);
+                typeName = discriminator(o);
             } else if(discriminator && o && o[discriminator]) {
-                typeDetails = this.typeInfo(o[discriminator]);
-            }
-            
-            if(typeDetails && typeDetails.type){
-                this.typeInfo(typeDetails.type, typeDetails);
+                typeName = o[discriminator];
             }
         }
+        
+        if(typeName)
+            typeDetails = this.typeInfo(typeName);
         
         if(!typeDetails){
             if(o && o[discriminator])
@@ -57,6 +53,7 @@
             typeDetails = new DocEditJsTypeInfo(typeName, o);
             
             if(typeDetails && typeDetails.type){
+                //cache the type info
                 this.typeInfo(typeDetails.type, typeDetails);
             }
         }
@@ -134,7 +131,7 @@
                     scope.dataRoot = scope.data;
                 }
                 
-                element.html('<div ng-include="\'dejs/template/node.html\'"></div>').show();
+                element.html('<div ng-include="\'dejs/template/node.html\'"></div>');
                 
                 $compile(element.contents())(scope);
             }
@@ -181,7 +178,7 @@
                 scope.dejsTypeInfo = de.getTypeInfo(scope.dejsDiscriminator, scope.dejsContent, typeFromParent);
                 
                 var setTemplate = function(template, element){
-                    var templateE = angular.element(template).show();
+                    var templateE = angular.element(template);
                     element.append(templateE);
                     $compile(element.contents())(scope);
                 }
@@ -210,7 +207,35 @@
         };
     }])
     .provider('doceditjs', function DocEditJsProvider() {
-      var discriminator = "_type";
+      
+      var discriminatorProperty = "_type";
+      var discriminator = function(o, typeName){
+        
+        if(typeName)
+            return typeName;
+            
+        if(o != undefined && o != null) {
+            if(o[discriminatorProperty] != null && o[discriminatorProperty] != undefined){
+                return o[discriminatorProperty];
+            }
+            
+            if(angular.isString(o))
+                return 'string';
+            
+            if(angular.isDate(o))
+                return 'date';
+                
+            if(angular.isArray(o))
+                return 'array';
+            
+            if(angular.isNumber(o))
+                return 'number';
+                
+            if(angular.isObject(o))
+                return 'object';
+        }
+        
+      };
       
       this.discriminator = function(value) {
           if(!value)

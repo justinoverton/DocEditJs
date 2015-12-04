@@ -1,0 +1,14 @@
+{
+  "name": "doceditjs",
+  "description": "A extensible JOSN document editor",
+  "version": "1.0.0",
+  "homepage": "https://github.com/justinoverton/DocEditJs",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular": "~1.4.0",
+    "angular-route": "~1.4.0",
+    "angular-loader": "~1.4.0",
+    "angular-mocks": "~1.4.0"
+  }
+}

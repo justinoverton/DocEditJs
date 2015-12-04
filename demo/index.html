@@ -22,7 +22,6 @@
   <body>
     <div ng-app="myApp" ng-controller="myController" class="container">
         {{document}}
-        <button type="button" ng-click="update()">Reset Object</button>
        <doceditjs-editor dejs-data="document"></doceditjs-editor>
     </div>
     
@@ -34,7 +33,7 @@
         
         angular.module('myApp', ['doceditjs'])
         .controller('myController', ['$scope', function($scope){
-
+            
             $scope.document = {
                 a: [
                     "item 1",
@@ -48,26 +47,12 @@
                         "item 4"
                         ]
                 },
-                d: "more stuff"
+                d: "more stuff",
+                e: {
+                    
+                }
             };
             
-            $scope.update = function(){
-                $scope.document = {
-                    a: [
-                        "item 1",
-                        "item 2",
-                        5,
-                        new Date()
-                    ],
-                    b: {
-                        c: [
-                            "item 3",
-                            "item 4"
-                            ]
-                    },
-                    d: "more stuff"
-                };
-            };
         }]);
         
     </script>
