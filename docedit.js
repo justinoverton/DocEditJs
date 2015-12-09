@@ -8,12 +8,19 @@
      * @ngInject
      * @export
      */
-    function DocEditJs(discriminator){
+    function DocEditJs(discriminator, typeInfos){
         
         var de =  this;
         
         de.discriminator = discriminator;
-        de._typeInfos = {};
+        de._typeInfos = [];
+        de.document = null;
+        
+        angular.forEach(typeInfos, function(o){
+           var t = new DocEditJsTypeInfo(o.type);
+           angular.extend(t, o);
+           de._typeInfos[t.type] = t;
+        });
         
         return this;
     }
@@ -81,6 +88,9 @@
         info.template = null;
         info.templateUrl = null;
         info.nameForProperty = function(obj, property){
+            if(obj && obj.name){
+                return obj.name;
+            }
             return property;
         };
         info.canAddChildren = false;
@@ -106,6 +116,7 @@
             } else if(angular.isArray(o)){
                 info.templateUrl = 'dejs/templates/array.html';
                 info.type = info.type || 'array';
+                info.canExpand = true;
             } else {
                 info.templateUrl = 'dejs/template/object.html';
                 info.canExpand = true;
@@ -120,8 +131,11 @@
     angular.module('doceditjs', [])
     .directive('doceditjsEditor', ['doceditjs', '$compile', function(doceditjs, $compile){
         var de = doceditjs;
-        
+        var dejsExpandedItems = {};
         function link(scope, element, attrs) {
+            
+            scope.dejsExpandedItems = dejsExpandedItems;
+            
             function loadDoc() {
                 scope.dejsDiscriminator = scope.dejsDiscriminator || de.discriminator;
                 scope.dejsTypeInfo = scope.dejsTypeInfo || de.getTypeInfo(scope.dejsDiscriminator, scope.data, scope.dejsTypeName);
@@ -129,6 +143,8 @@
                 if(!scope.dejsContentPath){
                     scope.dejsContentPath = attrs['dejsData'];
                     scope.dataRoot = scope.data;
+                } else {
+                    scope.dataRoot = scope.$parent.dataRoot;
                 }
                 
                 element.html('<div ng-include="\'dejs/template/node.html\'"></div>');
@@ -196,19 +212,14 @@
         }
         
         return {
-            /*
-            scope: {
-                dejsDiscriminator: '=',
-                dejsContent: '=',
-                dejsProperty: '='
-            },*/
-            //scope: true,
             link: link
         };
     }])
     .provider('doceditjs', function DocEditJsProvider() {
       
       var discriminatorProperty = "_type";
+      var typeInfos = [];
+      
       var discriminator = function(o, typeName){
         
         if(typeName)
@@ -242,10 +253,19 @@
             return discriminator;
             
           discriminator = value;
+          return this;
       };
       
+      this.typeInfos = function(value){
+          if(!value)
+            return typeInfos;
+         
+         typeInfos = value;
+         return this;
+      }
+      
       this.$get = [function DocEditJsFactory() {
-        return new DocEditJs(discriminator);
+        return new DocEditJs(discriminator, typeInfos);
       }];
     })
     .filter('dejsName', function DocEditJsNameFilter() {
@@ -258,8 +278,8 @@
         $templateCache.put('dejs/templates/string.html', '<input type="text" class="form-control" ng-model="data[k]" />');
         $templateCache.put('dejs/templates/date.html', '<input type="date" class="form-control" ng-model="data[k]" />');
         $templateCache.put('dejs/templates/number.html', '<input type="number" class="form-control" ng-model="data[k]" />');
-        $templateCache.put('dejs/templates/array.html', '<doceditjs-editor ng-model-options="{ updateOn: \'blur\' }" dejs-data="data[k]" dejs-content-path="dejsContentPath" dejs-type-info="dejsTypeInfo"></doceditjs-editor>');
-        $templateCache.put('dejs/template/object.html', '<doceditjs-editor dejs-data="data[k]" dejs-content-path="dejsContentPath" dejs-type-info="dejsTypeInfo"></doceditjs-editor>');
+        $templateCache.put('dejs/templates/array.html', '<doceditjs-editor ng-if="dejsExpandedItems[dejsContentPath]" ng-model-options="{ updateOn: \'blur\' }" dejs-data="data[k]" dejs-content-path="dejsContentPath" dejs-type-info="dejsTypeInfo"></doceditjs-editor>');
+        $templateCache.put('dejs/template/object.html', '<doceditjs-editor ng-if="dejsExpandedItems[dejsContentPath]" dejs-data="data[k]" dejs-content-path="dejsContentPath" dejs-type-info="dejsTypeInfo"></doceditjs-editor>');
         /*
         $templateCache.put('dejs/template/node.html', 
             '<ul class="doceditjs-nodes"> \
@@ -271,8 +291,9 @@
         $templateCache.put('dejs/template/node.html', 
             '<table class="table table-bordered doceditjs-nodes"> \
                 <tr ng-repeat="(k, v) in data track by $index">\
-                    <td class="doceditjs-td-label">{{k | dejsName:dejsTypeInfo:v}}</td>\
-                    <td class="doceditjs-td-content"> \
+                    <td class="doceditjs-td-label">\
+                    <span ng-if="dejsTypeInfo.canExpand && dejsExpandedItems[dejsContentPath]" ng-click="dejsExpandedItems[dejsContentPath] = !dejsExpandedItems[dejsContentPath]">-</span><span ng-if="dejsTypeInfo.canExpand && !dejsExpandedItems[dejsContentPath]" ng-click="dejsExpandedItems[dejsContentPath] = !dejsExpandedItems[dejsContentPath]">+</span>{{k | dejsName:dejsTypeInfo:v}}</td>\
+                    <td class="doceditjs-td-content">\
                         <doceditjs-item dejs-content=\'v\' dejs-property="k"></doceditjs-item> \
                     </td> \
                 <tr>\
